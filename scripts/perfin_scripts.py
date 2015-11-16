@@ -27,7 +27,7 @@ else:
 		to_date = args[3]
 
 		if action == 'report':
-			# perfin report fifth-third 11/01/2015 11/15/2015 -w electronic,paypal -f x.csv
+			
 			if account == 'all':
 				url = "http://localhost:8001/api/transactions/?from=%s&to=%s" % (from_date,to_date)
 

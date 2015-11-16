@@ -24,7 +24,7 @@ class GroupByWordList:
 			if math.isnan(amount):
 				amount = 0.00
 
-			formatted_name = name.lower().split(' ')
+			formatted_name = name.lower().replace('*','').split(' ')
 
 			summed_amount = 0
 
