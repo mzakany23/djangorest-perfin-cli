@@ -58,11 +58,16 @@ class AllTransactionsViewSet(APIView):
 		try: 
 			if request.GET:
 				try:
+
 					from_date = datetime.strptime(request.GET['from'],"%m/%d/%Y").strftime("%Y-%m-%d")
+					
 					to_date = datetime.strptime(request.GET['to'],"%m/%d/%Y").strftime("%Y-%m-%d")
+					print to_date
 					transactions = Transaction.objects.filter(date__range=[from_date,to_date]).order_by('-date')
+
 				except:
-					transactions = Transaction.objects.all()
+
+					transactions = Transaction.objects.all().order_by('-date')
 			else:
 				transactions = Transaction.objects.all()
 		except:

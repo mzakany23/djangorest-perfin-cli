@@ -1,3 +1,4 @@
+# python
 import sys
 import os
 import shutil
@@ -5,6 +6,9 @@ from os.path import basename, abspath
 from optparse import OptionParser
 import requests
 import pandas as pd
+# app
+from analysis import GroupByWordList
+
 
 parser = OptionParser(version="0.0.1")
 parser.add_option("-f", "--file", dest="filename",help="save csv to (usually on desktop)", metavar="FILE")
@@ -16,12 +20,36 @@ if not args:
 	sys.stdout.write('use like this:     perfin get fifth-third 10/01/2015 10/31/2015 -f file.csv     ')
 	exit(2)
 else:
-
 	if len(args) == 4:
 		action = args[0]
 		account = args[1]
 		from_date = args[2]
 		to_date = args[3]
+
+		if action == 'report':
+			# perfin report fifth-third 11/01/2015 11/15/2015 -w electronic,paypal -f x.csv
+			if account == 'all':
+				url = "http://localhost:8001/api/transactions/?from=%s&to=%s" % (from_date,to_date)
+
+				if options.wordlist:
+					wordlist = options.wordlist.split(',')
+					x = GroupByWordList(url,wordlist)
+					if options.filename and action == 'report':
+						x.run().to_csv(str(options.filename))
+					else:
+						x.run().show()
+				
+			else:
+				url = "http://localhost:8001/api/transactions/%s/?from=%s&to=%s" % (account,from_date,to_date)
+				if options.wordlist:
+					wordlist = options.wordlist.split(',')
+					x = GroupByWordList(url,wordlist)
+					if options.filename and action == 'report':
+						x.run().to_csv(str(options.filename))
+					else:
+						x.run().show()
+
+
 
 		if account == 'all' and not options.wordlist:
 			url = 'http://localhost:8001/api/transactions/?from=%s&to=%s' % (from_date,to_date)
@@ -40,7 +68,7 @@ else:
 		else:
 			get_transactions = requests.get(url)
 
-		if options.filename:
+		if options.filename and action != 'report':
 			filename = options.filename
 			pd.read_json(get_transactions.text)[['account','date','name','amount']].to_csv(filename)
 		else:

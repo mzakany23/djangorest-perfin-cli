@@ -39,3 +39,9 @@ perfin get fifth-third 10/01/2015 10/31/2015  -w paypal,starbucks -f x.csv
 
 #wordlist by all filtered
 perfin get all 10/01/2015 10/31/2015  -w paypal,starbucks -f x.csv
+
+#report account specific summed by wordlist
+perfin report fifth-third 10/01/2015 11/30/2015 -w electronic,paypal -f greg.csv
+
+#report all summed by wordlist 
+perfin report all 10/01/2015 11/30/2015 -w paypal,starbucks,electronic -f greg.csv
