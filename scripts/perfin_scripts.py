@@ -40,6 +40,7 @@ else:
 						x.run().show()
 				
 			else:
+
 				url = "http://localhost:8001/api/transactions/%s/?from=%s&to=%s" % (account,from_date,to_date)
 				if options.wordlist:
 					wordlist = options.wordlist.split(',')
@@ -65,6 +66,9 @@ else:
 			wordlist = options.wordlist
 			url = "http://localhost:8001/api/search-by-wordlist/?account=%s&from=%s&to=%s" % (account,from_date,to_date)
 			get_transactions = requests.post(url, data={"wordlist": wordlist})
+		elif account != 'all' and not options.wordlist:
+			url = 'http://localhost:8001/api/transactions/%s/?from=%s&to=%s' % (account,from_date,to_date)
+			get_transactions = requests.get(url)
 		else:
 			get_transactions = requests.get(url)
 
