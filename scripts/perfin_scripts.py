@@ -41,7 +41,6 @@ else:
 			get_transactions = requests.get(url)
 
 		if options.filename:
-			
 			filename = options.filename
 			pd.read_json(get_transactions.text)[['account','date','name','amount']].to_csv(filename)
 		else:
@@ -51,7 +50,6 @@ else:
 	
 	if len(args) == 2:
 		if args[1] == 'all' and not options.wordlist:
-
 			url = 'http://localhost:8001/api/transactions/'
 			get_transactions = requests.get(url)
 			if options.filename:
