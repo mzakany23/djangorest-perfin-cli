@@ -109,6 +109,8 @@ else:
 					myreport(args[1],int(args[2]))
 				except KeyError:
 					print 'ERROR DUDE: use like this: perfin myreport dec 2015'
+				except ValueError:
+					print "Error Dude: transactions don't go back that far!!!"
 	
 	if len(args) == 2:
 
