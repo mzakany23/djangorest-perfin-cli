@@ -8,8 +8,7 @@ import requests
 import pandas as pd
 # app
 from analysis import GroupByWordList
-from config import WordList
-from lib.helper import to_date_range,today
+from lib.helper import myreport
 
 
 parser = OptionParser(version="0.0.1")
@@ -103,6 +102,13 @@ else:
 			# print pd.read_json(get_transactions.text)[['account','date','name','amount']]
 			pass
 
+	if len(args) == 3:
+		if args[0] == 'myreport':
+			if args[1] and args[2]:
+				try:
+					myreport(args[1],int(args[2]))
+				except KeyError:
+					print 'ERROR DUDE: use like this: perfin myreport dec 2015'
 	
 	if len(args) == 2:
 
@@ -167,21 +173,7 @@ else:
 
 	if len(args) == 1:
 		if args[0] == 'myreport':
-			dr = to_date_range()
-			
-			ft_url = "http://localhost:8001/api/transactions/fifth-third/?from=%s&to=%s" % (dr[0],dr[1])
-			cu_url = "http://localhost:8001/api/transactions/chase-united/?from=%s&to=%s" % (dr[0],dr[1])
-			
-			payload = GroupByWordList(ft_url,WordList.FIXED_LIST)
-			payload = GroupByWordList(cu_url,WordList.VARIABLE_LIST)
-			
-			dd = WordList.DEFAULT_DIR
-
-			ft_loc = "%s/fifth-third-%s.csv" % (dd,today())
-			cu_loc = "%s/chase-united-%s.csv" % (dd,today())
-			
-			payload.run().to_csv(ft_loc)
-			payload.run().to_csv(cu_loc)
+			myreport()
 
 		if args[0] == 'upload':
 			
