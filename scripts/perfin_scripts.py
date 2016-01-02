@@ -8,18 +8,25 @@ import requests
 import pandas as pd
 # app
 from analysis import GroupByWordList
+from config import WordList
+from lib.helper import to_date_range,today
 
 
 parser = OptionParser(version="0.0.1")
 parser.add_option("-f", "--file", dest="filename",help="save csv to (usually on desktop)", metavar="FILE")
 parser.add_option("-w", "--wordlist",dest="wordlist",help="search by wordlist")
+parser.add_option("-$", "--amount",dest="amount",help="search by amounts")
+parser.add_option("-t", "--type",dest="type",help="report type")
+parser.add_option("-d", "--date",dest="date",help="date")
 
 options, args = parser.parse_args()
+
 
 if not args:
 	sys.stdout.write('use like this:     perfin get fifth-third 10/01/2015 10/31/2015 -f file.csv     ')
 	exit(2)
 else:
+	
 	if len(args) == 4:
 		action = args[0]
 		account = args[1]
@@ -37,6 +44,7 @@ else:
 					if options.filename and action == 'report':
 						x.run().to_csv(str(options.filename))
 					else:
+						print 'ok here i am'
 						x.run().show()
 				
 			else:
@@ -50,12 +58,23 @@ else:
 					else:
 						x.run().show()
 
-
+		# search by amounts
+		if options.amount and len(options.amount.split(',')) == 2:
+			amounts = options.amount.split(',')
+			min = amounts[0]
+			max = amounts[1]
+			url = 'http://localhost:8001/api/search-by-amounts/?account=%s&min=%s&max=%s&from=%s&to=%s' % (account,min,max,from_date,to_date)
+			req = requests.get(url)
+			if options.filename:
+				if req.status_code == 200 and options.filename:
+					pd.read_json(req.text).to_csv(options.filename)
+				else:
+					print req
+			exit(2)
 
 		if account == 'all' and not options.wordlist:
 			url = 'http://localhost:8001/api/transactions/?from=%s&to=%s' % (from_date,to_date)
 		else:
-			# url = 'http://localhost:8001/api/transactions/%s/?from=%s&to=%s' % (account,from_date,to_date)
 			url = "http://localhost:8001/api/search-by-wordlist/?account=%s&from=%s&to=%s" % (account,from_date,to_date)
 
 		if account != 'all' and options.wordlist:
@@ -69,6 +88,11 @@ else:
 		elif account != 'all' and not options.wordlist:
 			url = 'http://localhost:8001/api/transactions/%s/?from=%s&to=%s' % (account,from_date,to_date)
 			get_transactions = requests.get(url)
+			df = pd.read_json(get_transactions.text)[['date','name','amount']]
+			# df.sort('date',ascending=False)
+			df.drop_duplicates().to_csv(options.filename)
+
+			exit(2)
 		else:
 			get_transactions = requests.get(url)
 
@@ -81,6 +105,7 @@ else:
 
 	
 	if len(args) == 2:
+
 		if args[1] == 'all' and not options.wordlist:
 			url = 'http://localhost:8001/api/transactions/'
 			get_transactions = requests.get(url)
@@ -90,9 +115,25 @@ else:
 			else:
 				print pd.read_json(get_transactions.text)[['account','date','name','amount']]
 		else:
+			# do a net income calculation
+			# needs finished
+			if options.type:
+				account = args[1]
+				date = options.date.split('-')
+				fd,td = date[0],date[1]
+				min,max = 0,20000
+				if options.type and options.date:
+					url = 'http://localhost:8001/api/search-by-amounts/?account=%s&min=%s&max=%s&from=%s&to=%s' % (account,min,max,from_date,to_date)
+					req = requests.get(url)
+				else:
+					exit(2)
+
+
+				
+
 			if options.wordlist:
 				wordlist = options.wordlist
-
+				
 				if args[1] != 'all' and wordlist:
 					req = requests.post(
 						"http://localhost:8001/api/search-by-wordlist/?account=%s" % args[1], 
@@ -125,6 +166,22 @@ else:
 					print pd.read_json(get_transactions.text)[['account','date','name','amount']]
 
 	if len(args) == 1:
+		if args[0] == 'myreport':
+			dr = to_date_range()
+			
+			ft_url = "http://localhost:8001/api/transactions/fifth-third/?from=%s&to=%s" % (dr[0],dr[1])
+			cu_url = "http://localhost:8001/api/transactions/chase-united/?from=%s&to=%s" % (dr[0],dr[1])
+			
+			payload = GroupByWordList(ft_url,WordList.FIXED_LIST)
+			payload = GroupByWordList(cu_url,WordList.VARIABLE_LIST)
+			
+			dd = WordList.DEFAULT_DIR
+
+			ft_loc = "%s/fifth-third-%s.csv" % (dd,today())
+			cu_loc = "%s/chase-united-%s.csv" % (dd,today())
+			
+			payload.run().to_csv(ft_loc)
+			payload.run().to_csv(cu_loc)
 
 		if args[0] == 'upload':
 			

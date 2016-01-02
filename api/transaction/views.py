@@ -14,6 +14,60 @@ from transaction.models import Transaction,Account
 from serializers import TransactionSerializer
 from form import TransactionForm
 
+
+class FilterByAmountsViewSet(APIView):
+	def get(self,request):
+		try:
+			account = request.GET['account']
+		except:
+			account = None 
+
+		try:
+			min = request.GET['min']
+		except:
+			min = None
+
+		try:
+			max = request.GET['max']
+		except:
+			max = None 
+
+		try:
+			from_date = datetime.strptime(request.GET['from'],"%m/%d/%Y").strftime("%Y-%m-%d")
+		except:
+			from_date = None 
+
+		try:
+			to_date = datetime.strptime(request.GET['to'],"%m/%d/%Y").strftime("%Y-%m-%d")
+		except:
+			to_date = None
+
+		try:
+			trans_account = Account.objects.get(slug=account)
+		except:
+			trans_account = None
+
+		if account and min and max and from_date and to_date:
+			try:
+				transaction_set = Transaction.objects.filter(account=trans_account).filter(amount__lte=float(max)).filter(amount__gte=float(min)).filter(date__gte=from_date).filter(date__lte=to_date).order_by('-date')
+			except:
+				transaction_set = None
+
+		if not from_date and not to_date and min and max: 
+			try:
+				transaction_set = Transaction.objects.filter(account=trans_account).filter(amount__lte=float(max)).filter(amount__gte=float(min)).order_by('-date')
+			except:
+				transaction_set = None 
+
+		if transaction_set:
+			serializer_class = TransactionSerializer
+			serializer = TransactionSerializer(transaction_set,many=True)
+			return Response(serializer.data,status=status.HTTP_200_OK)
+		else:
+			return Response('There was a problem brah',status=status.HTTP_204_NO_CONTENT)
+
+
+
 class FilterByWordListViewSet(APIView):
 	def post(self,request):
 		try:
@@ -62,7 +116,7 @@ class AllTransactionsViewSet(APIView):
 					from_date = datetime.strptime(request.GET['from'],"%m/%d/%Y").strftime("%Y-%m-%d")
 					
 					to_date = datetime.strptime(request.GET['to'],"%m/%d/%Y").strftime("%Y-%m-%d")
-					print to_date
+					
 					transactions = Transaction.objects.filter(date__range=[from_date,to_date]).order_by('-date')
 
 				except:
