@@ -51,7 +51,7 @@ perfin get fifth-third 10/01/2015 11/15/2015 -$ 100,5000 -f x.csv
 
 #most used
 
-perfin get fifth-third 11/01/2015 11/10/2015 -f win.csv
+perfin get fifth-third 01/01/2016 01/31/2016 -f win.csv
 perfin get all -f win.csv
 perfin get all 08/15/2015 10/31/2015 -f win.csv
 
@@ -64,10 +64,11 @@ perfin report all 12/01/2015 12/30/2015 -w lmcu,paypal,chase,musical,mobile,elec
 # reports by key
 #----------------------------------------------
 
-perfin report fifth-third 12/01/2015 12/30/2015 -w paypal,electronic -f fifth-third.csv
+perfin report fifth-third 12/01/2015 02/23/2016 -w paypal,electronic -f fifth-third.csv
 
-perfin report chase-united 12/01/2015 12/30/2015 -w paypal,chipotle,wrnr,fitness,phoenix,wholefds,starbucks,cvs/pharmacy,utilitie,cinemas,cinemark,yoga,oil,la,theatre,fc34,payment -f chase-united.csv
+perfin report chase-united 12/01/2015 02/23/2016 -w paypal,chipotle,wrnr,fitness,phoenix,wholefds,starbucks,cvs/pharmacy,utilitie,cinemas,cinemark,yoga,oil,la,theatre,fc34,payment -f chase-united.csv
 
-
+perfin report chase-united 02/01/2016 02/28/2016 -w payment -f chase-united.csv
+perfin report fifth-third 02/01/2016 02/28/2016 -w musical,paid,deposit -f fifth-third.csv
 
 

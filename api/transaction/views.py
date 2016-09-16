@@ -13,6 +13,7 @@ from django.db.models import Q
 from transaction.models import Transaction,Account
 from serializers import TransactionSerializer
 from form import TransactionForm
+from api.helper.paginator_helper import APIGenericGenerator
 
 
 class FilterByAmountsViewSet(APIView):
@@ -109,6 +110,22 @@ class FilterByWordListViewSet(APIView):
 class AllTransactionsViewSet(APIView):
 
 	def get(self,request):
+		try:
+			page = request.GET['page']
+		except:
+			page = None 
+
+		try:
+			results = request.GET['results']
+		except:
+			results = None
+
+		try:
+			account = request.GET['account']
+		except:
+			account = None
+
+		
 		try: 
 			if request.GET:
 				try:
